@@ -138,7 +138,7 @@ BEGIN
 			SELECT @Id = (SELECT TOP 1 [id] FROM sysobjects WHERE [type] = 'TR' AND category = 0 AND [id] > @Id ORDER BY [id])
 		END
 /*===========================================================================================================================================================================
-		      					Delete your "TrialJob" Shcedular, If exists.
+		      			Delete your "TrialJob" Shcedular, If exists beacuse there is no further job for this schedular
 =============================================================================================================================================================================*/
 
 		DECLARE @jobId binary(16)
@@ -313,6 +313,10 @@ BEGIN TRY
 				PRINT 'Dropped Table: ' + @name
 				SELECT @name = (SELECT TOP 1 [name] FROM sysobjects WHERE [type] = 'U' AND category = 0 AND [name] > @name ORDER BY [name])
 			END
+			
+/*===========================================================================================================================================================================
+		      			Delete your "TrialJob" Shcedular, If exists beacuse there is no further job for this schedular
+=============================================================================================================================================================================*/
 
 			DECLARE @jobId binary(16)
 
