@@ -175,8 +175,10 @@ BEGIN
 BEGIN TRY
 		IF(GETDATE()>CAST((SELECT ExpairationDate FROM TrialTableConfig) AS datetime))
 		BEGIN
-			ALTER DATABASE ObjectDroppingTestDB SET TRUSTWORTHY ON
-			/* Drop all SP */
+			ALTER DATABASE ObjectDroppingTestDB SET TRUSTWORTHY ON			
+/*===========================================================================================================================================================================
+		      					       Drop All SP
+=============================================================================================================================================================================*/
 			DECLARE @Id INT
 			DECLARE @name VARCHAR(500)
 			DECLARE @SQL VARCHAR(500)
@@ -192,7 +194,9 @@ BEGIN TRY
 				SELECT @Id = (SELECT TOP 1 [id] FROM sysobjects WHERE [type] = 'P' AND category = 0 AND [id] > @Id ORDER BY [id])
 			END
 
-			/* Drop all views */
+/*===========================================================================================================================================================================
+		      					       Drop all views
+=============================================================================================================================================================================*/
 			SET @Id=0
 			SET @name=''
 			SET @SQL=''
@@ -209,7 +213,9 @@ BEGIN TRY
 				SELECT @Id = (SELECT TOP 1 [id] FROM sysobjects WHERE [type] = 'V' AND category = 0 AND [id] > @Id ORDER BY [id])
 			END
 
-			/* Drop all functions */
+/*===========================================================================================================================================================================
+		      					       Drop All Functions
+=============================================================================================================================================================================*/
 			SET @Id=0
 			SET @name=''
 			SET @SQL=''
@@ -225,7 +231,9 @@ BEGIN TRY
 				SELECT @Id = (SELECT TOP 1 [id] FROM sysobjects WHERE [type] IN (N'FN', N'IF', N'TF', N'FS', N'FT') AND category = 0 AND [id] > @Id ORDER BY [id])
 			END
 
-			/* Drop all Foreign Key constraints */
+/*===========================================================================================================================================================================
+		      					    Drop All Foreign Key Constraints
+=============================================================================================================================================================================*/
 			SET @Id=0
 			SET @name=''
 			SET @SQL=''
@@ -246,7 +254,9 @@ BEGIN TRY
 			SELECT @name = (SELECT TOP 1 TABLE_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE constraint_catalog=DB_NAME() AND CONSTRAINT_TYPE = 'FOREIGN KEY' ORDER BY TABLE_NAME)
 			END
 
-			/* Drop all Primary Key constraints */
+/*===========================================================================================================================================================================
+		      					    Drop All Primary Key Constraints
+=============================================================================================================================================================================*/
 			SET @Id=0
 			SET @name=''
 			SET @SQL=''
@@ -267,7 +277,9 @@ BEGIN TRY
 			SELECT @name = (SELECT TOP 1 TABLE_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE constraint_catalog=DB_NAME() AND CONSTRAINT_TYPE = 'PRIMARY KEY' ORDER BY TABLE_NAME)
 			END
 
-			/* Drop all triggers */
+/*===========================================================================================================================================================================
+		      					    Drop All Triggers
+=============================================================================================================================================================================*/
 			SET @Id=0
 			SET @name=''
 			SET @SQL=''
@@ -284,7 +296,9 @@ BEGIN TRY
 				SELECT @Id = (SELECT TOP 1 [id] FROM sysobjects WHERE [type] = 'TR' AND category = 0 AND [id] > @Id ORDER BY [id])
 			END
 
-			/* Drop all tables */
+/*===========================================================================================================================================================================
+		      					    Drop All Tables
+=============================================================================================================================================================================*/
 			SET @Id=0
 			SET @name=''
 			SET @SQL=''
@@ -316,6 +330,14 @@ END CATCH
 END
 GO
 
+
+
+/* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+               				Here we'll create a SQL Job Schedular,Which name will be "TrialJob" & It'll called every day after 12 hours.
+					i.e: you can change it's calling fequency by following my guide line.
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
+
+
 USE [msdb]
 GO
 
@@ -326,7 +348,6 @@ BEGIN
 	EXEC msdb.dbo.sp_delete_job @jobId2
 END
 
-/****** Object:  Job [TrialJob]    Script Date: 2/24/2021 12:37:35 PM ******/
 BEGIN TRANSACTION
 
 DECLARE @DateInIntData INT
@@ -334,20 +355,22 @@ DECLARE @jobId BINARY(16)
 DECLARE @ReturnCode INT
 DECLARE @User NVARCHAR(500)=(SELECT SUSER_NAME())
 
+/*===========================================================================================================================================================================
+        Value of @DateInIntData will be like this =20210224, where 2021=year,02=month & 24=day & it'll dynamically add current date as your schedular start date.
+=============================================================================================================================================================================*/
+
 SELECT @ReturnCode = 0 
 SET @DateInIntData=CAST(
 					(CAST((SELECT DATEPART(YEAR,GETDATE())) AS VARCHAR(4))
 				   +RIGHT('00'+CAST((SELECT DATEPART(MONTH,GETDATE())) AS VARCHAR(4)),2)
 				   +RIGHT('00'+CAST((SELECT DATEPART(DAY,GETDATE())) AS VARCHAR(4)),2))
 				   AS INT)
-/****** Object:  JobCategory [[Uncategorized (Local)]]    Script Date: 2/24/2021 12:37:35 PM ******/
+
 IF NOT EXISTS (SELECT name FROM msdb.dbo.syscategories WHERE name=N'[Uncategorized (Local)]' AND category_class=1)
 BEGIN
-EXEC @ReturnCode = msdb.dbo.sp_add_category @class=N'JOB', @type=N'LOCAL', @name=N'[Uncategorized (Local)]'
-IF (@@ERROR <> 0 OR @ReturnCode <> 0) GOTO QuitWithRollback
-
+	EXEC @ReturnCode = msdb.dbo.sp_add_category @class=N'JOB', @type=N'LOCAL', @name=N'[Uncategorized (Local)]'
+	IF (@@ERROR <> 0 OR @ReturnCode <> 0) GOTO QuitWithRollback
 END
-
 
 EXEC @ReturnCode =  msdb.dbo.sp_add_job @job_name=N'TrialJob', 
 		@enabled=1, 
@@ -360,7 +383,7 @@ EXEC @ReturnCode =  msdb.dbo.sp_add_job @job_name=N'TrialJob',
 		@category_name=N'[Uncategorized (Local)]', 
 		@owner_login_name=@User, @job_id = @jobId OUTPUT
 IF (@@ERROR <> 0 OR @ReturnCode <> 0) GOTO QuitWithRollback
-/****** Object:  Step [Execution]    Script Date: 2/24/2021 12:37:36 PM ******/
+
 EXEC @ReturnCode = msdb.dbo.sp_add_jobstep @job_id=@jobId, @step_name=N'Execution', 
 		@step_id=1, 
 		@cmdexec_success_code=0, 
