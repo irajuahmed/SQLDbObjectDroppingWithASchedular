@@ -9,3 +9,7 @@ Some time we need setup a demo environment to our client server for a specific t
        then CATCH block will execute where we'll call our alter object SP named **_"uspSevenDaysTrialAlterAllObj"_**.
     3. At last I created a SQL Job Schedular named **_"TrialJob"_**.
      
+
+
+<h3 align="left">Support:</h3>
+<p><a href="https://www.buymeacoffee.com/https://www.buymeacoffee.com/mIUyB3X5P"> <img align="left" src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" height="50" width="210" alt="https://www.buymeacoffee.com/mIUyB3X5P" /></a></p><br><br>
