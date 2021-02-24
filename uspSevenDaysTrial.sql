@@ -329,7 +329,13 @@ BEGIN TRY
 
 END TRY
 BEGIN CATCH 
+
+/*===========================================================================================================================================================================
+		      		if any error occured in our "uspSevenDaysTrial" SP/ or user don't have drop permission then error will occured 
+				then our CATCH block will execute & here we'll call our alter object SP.
+=============================================================================================================================================================================*/
 	EXEC uspSevenDaysTrialAlterAllObj;
+	
 END CATCH	
 END
 GO
