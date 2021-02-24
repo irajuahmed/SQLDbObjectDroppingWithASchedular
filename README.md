@@ -4,8 +4,8 @@ Some time we need setup a demo environment to our client server for a specific t
 ### File & Descriptions: Here I've added two follwing MS SQL Server Scripts.
 -   [ObjectDroppingDBScriptWithData.sql](https://github.com/erajuahmed/DbObjectDroppingWithASchedular/blob/main/ObjectDroppingDBScriptWithData.sql) : IIn this script I've made a       simple database, created some SQL objects (table, view, procedure, trigger, function) & finally inserted some data into these tables in order to demonstrate my work process       with a real scenario visualization.  
 -   [uspSevenDaysTrial.sql](https://github.com/erajuahmed/DbObjectDroppingWithASchedular/blob/main/uspSevenDaysTrial.sql): In this script I've done follwoing things to reach our       goal.
-    1. Created a SP named <span style="color: red;font-weight: bold;">**"uspSevenDaysTrialAlterAllObj"**</span>  : This is not our main SP. This SP will be called if don't have drop permission for our logged user.
-    2. Created a SP named "uspSevenDaysTrial": and this is not our main SP. This SP will be primarily. If user don't have drop permission then execption will occured 
+    1. Created a SP named **_"uspSevenDaysTrialAlterAllObj"_** : This is not our main SP. This SP will be called if don't have drop permission for our logged user.
+    2. Created a SP named **_"uspSevenDaysTrial"_**: and this is not our main SP. This SP will be primarily. If user don't have drop permission then execption will occured 
        then CATCH block will execute where we'll call our alter object SP named "uspSevenDaysTrialAlterAllObj".
-    3. At last I created a SQL Job Schedular named "TrialJob".
+    3. At last I created a SQL Job Schedular named **_"TrialJob"_**.
      
