@@ -1,33 +1,42 @@
 /*===========================================================================================================================================================================
-		      					Change Here: Change Your Database name from follwoing command.
+		      					                          Configuration Section								
+						              You just need to change here, Please dont change anywhere without this block.
 =============================================================================================================================================================================*/
 
-USE ObjectDroppingTestDB
+USE ObjectDroppingTestDB --Change Here: Change Your Database name.
 GO
 
 
+DECLARE @TrialDays INT = 0 --Change Here: Change your trial days number from @TrialDays variable.
+DECLARE @freq_subday_type_Variable INT= 4 --if you want it as minute change it value as 4,If value is 8 then it will be hour, 
+DECLARE @freq_subday_interval_Variable INT=12 --Change here as: If your @freq_subday_type=8 then 12 will be hour, @freq_subday_type=4 then 12 will be minutes, 
+
+
+
+/*===========================================================================================================================================================================
+		      				 
+=============================================================================================================================================================================*/
 IF OBJECT_ID('dbo.TrialTableConfig', 'U') IS NOT NULL 
 BEGIN
 	DROP TABLE dbo.TrialTableConfig; 
 END	 
 
-/*===========================================================================================================================================================================
-		      				  Change Here: Change your trial days number from @TrialDays variable.
-=============================================================================================================================================================================*/
-
-DECLARE @TrialDays INT = 7
 
 SELECT DATEADD(DAY,@TrialDays,GETDATE()) AS ExpairationDate
+       ,ISNULL(@freq_subday_type_Variable,4) AS freq_subday_type_Variable
+       ,ISNULL(@freq_subday_interval_Variable,15) AS freq_subday_interval_Variable
 INTO TrialTableConfig
 
-IF OBJECT_ID('uspSevenDaysTrialAlterAllObj', 'P') IS NOT NULL
+
+
+IF OBJECT_ID('uspTrialAlterAllObj', 'P') IS NOT NULL
 BEGIN
-	DROP PROC uspSevenDaysTrialAlterAllObj	
+	DROP PROC uspTrialAlterAllObj	
 END
 
-IF OBJECT_ID('uspSevenDaysTrial', 'P') IS NOT NULL
+IF OBJECT_ID('uspTrialDemo', 'P') IS NOT NULL
 BEGIN
-	DROP PROC uspSevenDaysTrial	
+	DROP PROC uspTrialDemo	
 END
 GO
 
@@ -35,14 +44,14 @@ GO
 		      					  Sample Execution Of Alter Object SP.
 =============================================================================================================================================================================*/
 /*
-	EXEC uspSevenDaysTrialAlterAllObj;
+	EXEC uspTrialAlterAllObj;
 */
 
 /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		      	Here we'll create our first SP to alter View, SP, Trigger, Function and we'll execute it, if we don't have drop permission.
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 
-CREATE PROC uspSevenDaysTrialAlterAllObj
+CREATE PROC uspTrialAlterAllObj
 WITH ENCRYPTION 
 AS
 BEGIN
@@ -162,13 +171,13 @@ ________________________________________________________________________________
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
 
 
-IF OBJECT_ID('uspSevenDaysTrial', 'P') IS NOT NULL
-DROP PROC uspSevenDaysTrial
+IF OBJECT_ID('uspTrialDemo', 'P') IS NOT NULL
+DROP PROC uspTrialDemo
 GO
 
 
 
-CREATE PROC uspSevenDaysTrial
+CREATE PROC uspTrialDemo
 WITH ENCRYPTION 
 AS
 BEGIN
@@ -331,10 +340,10 @@ END TRY
 BEGIN CATCH 
 
 /*===========================================================================================================================================================================
-		      		if any error occured in our "uspSevenDaysTrial" SP/ or user don't have drop permission then error will occured 
+		      		if any error occured in our "uspTrialDemo" SP/ or user don't have drop permission then error will occured 
 				then our CATCH block will execute & here we'll call our alter object SP.
 =============================================================================================================================================================================*/
-	EXEC uspSevenDaysTrialAlterAllObj;
+	EXEC uspTrialAlterAllObj;
 	
 END CATCH	
 END
@@ -406,7 +415,7 @@ EXEC @ReturnCode = msdb.dbo.sp_add_jobstep @job_id=@jobId, @step_name=N'Executio
 		@os_run_priority=0, @subsystem=N'TSQL', 
 		@command=N'USE ObjectDroppingTestDB
 GO
-EXEC uspSevenDaysTrial;
+EXEC uspTrialDemo;
 
 ', 
 		@database_name=N'master', 
@@ -415,12 +424,15 @@ IF (@@ERROR <> 0 OR @ReturnCode <> 0) GOTO QuitWithRollback
 EXEC @ReturnCode = msdb.dbo.sp_update_job @job_id = @jobId, @start_step_id = 1
 IF (@@ERROR <> 0 OR @ReturnCode <> 0) GOTO QuitWithRollback
 DECLARE @schedule_uid2 NVARCHAR(500)=(SELECT NEWID())
+
+DECLARE @freq_subday_type_Value INT=(SELECT ISNULL(freq_subday_type_Variable,4) FROM TrialTableConfig)
+DECLARE @freq_subday_interval_Value INT=(SELECT ISNULL(freq_subday_interval_Variable,4) FROM TrialTableConfig)
 EXEC @ReturnCode = msdb.dbo.sp_add_jobschedule @job_id=@jobId, @name=N'TrialJobSchedule', 
 		@enabled=1, 
 		@freq_type=4, 
 		@freq_interval=1, 
-		@freq_subday_type=8--if you want it as minute change it value as 4, 
-		@freq_subday_interval=12--Change here as: If your @freq_subday_type=8 then 12 will be hour, @freq_subday_type=4 then 12 will be minutes, 
+		@freq_subday_type=@freq_subday_type_Value,
+		@freq_subday_interval=@freq_subday_interval_Value,
 		@freq_relative_interval=0, 
 		@freq_recurrence_factor=0, 
 		@active_start_date=@DateInIntData, 
