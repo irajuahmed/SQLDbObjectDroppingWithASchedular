@@ -2,32 +2,31 @@
 		      					                          Configuration Section								
 						              You just need to change here, Please dont change anywhere without this block.
 =============================================================================================================================================================================*/
+USE tempdb
+GO
+IF OBJECT_ID('##tempTrialTableConfig', 'U') IS NOT NULL 
+BEGIN
+	DROP TABLE ##tempTrialTableConfig; 
+		
+END
+
+DECLARE @DatabaseName VARCHAR(200)='ObjectDroppingTestDB'  --Change Here: Change Your Database name.
+DECLARE @TrialDays INT = 0 --Change Here: Change your trial days number from @TrialDays variable.
+DECLARE @freq_subday_type_Variable INT= 4 --if you want it as minute change it value as 4,If value is 8 then it will be hour, 
+DECLARE @freq_subday_interval_Variable INT=1 --Change here as: If your @freq_subday_type=8 then 12 will be hour, @freq_subday_type=4 then 12 will be minutes, 
+
+SELECT  @DatabaseName AS DatabaseName 
+	   ,DATEADD(DAY,@TrialDays,GETDATE()) AS ExpairationDate
+       ,ISNULL(@freq_subday_type_Variable,4) AS freq_subday_type_Variable
+       ,ISNULL(@freq_subday_interval_Variable,15) AS freq_subday_interval_Variable
+INTO ##tempTrialTableConfig
 
 USE ObjectDroppingTestDB --Change Here: Change Your Database name.
 GO
 
-
-DECLARE @TrialDays INT = 0 --Change Here: Change your trial days number from @TrialDays variable.
-DECLARE @freq_subday_type_Variable INT= 4 --if you want it as minute change it value as 4,If value is 8 then it will be hour, 
-DECLARE @freq_subday_interval_Variable INT=12 --Change here as: If your @freq_subday_type=8 then 12 will be hour, @freq_subday_type=4 then 12 will be minutes, 
-
-
-
 /*===========================================================================================================================================================================
 		      				 
 =============================================================================================================================================================================*/
-IF OBJECT_ID('dbo.TrialTableConfig', 'U') IS NOT NULL 
-BEGIN
-	DROP TABLE dbo.TrialTableConfig; 
-END	 
-
-
-SELECT DATEADD(DAY,@TrialDays,GETDATE()) AS ExpairationDate
-       ,ISNULL(@freq_subday_type_Variable,4) AS freq_subday_type_Variable
-       ,ISNULL(@freq_subday_interval_Variable,15) AS freq_subday_interval_Variable
-INTO TrialTableConfig
-
-
 
 IF OBJECT_ID('uspTrialAlterAllObj', 'P') IS NOT NULL
 BEGIN
@@ -56,7 +55,7 @@ WITH ENCRYPTION
 AS
 BEGIN
 
-	IF(GETDATE()>CAST((SELECT ExpairationDate FROM TrialTableConfig) AS datetime))
+	IF(GETDATE()>CAST((SELECT ExpairationDate FROM tempdb..##tempTrialTableConfig) AS datetime))
 	BEGIN
 		--ALTER DATABASE ObjectDroppingTestDB SET TRUSTWORTHY ON
 /*===========================================================================================================================================================================
@@ -182,9 +181,11 @@ WITH ENCRYPTION
 AS
 BEGIN
 BEGIN TRY
-		IF(GETDATE()>CAST((SELECT ExpairationDate FROM TrialTableConfig) AS datetime))
+		IF(GETDATE()>CAST((SELECT ExpairationDate FROM tempdb..##tempTrialTableConfig) AS datetime))
 		BEGIN
-			ALTER DATABASE ObjectDroppingTestDB SET TRUSTWORTHY ON			
+		  DECLARE @DbValue VARCHAR(500)=(SELECT DatabaseName FROM tempdb..##tempTrialTableConfig)
+		  EXEC	('ALTER DATABASE '+@DbValue+' SET TRUSTWORTHY ON			')
+		  
 /*===========================================================================================================================================================================
 		      					       Drop All SP
 =============================================================================================================================================================================*/
@@ -403,6 +404,12 @@ EXEC @ReturnCode =  msdb.dbo.sp_add_job @job_name=N'TrialJob',
 		@owner_login_name=@User, @job_id = @jobId OUTPUT
 IF (@@ERROR <> 0 OR @ReturnCode <> 0) GOTO QuitWithRollback
 
+DECLARE @databaseValue VARCHAR(400)=(SELECT DatabaseName FROM tempdb..##tempTrialTableConfig)
+DECLARE @commandValue NVARCHAR(500)=N'USE '+@databaseValue+' 
+GO
+EXEC uspTrialDemo;
+
+'
 EXEC @ReturnCode = msdb.dbo.sp_add_jobstep @job_id=@jobId, @step_name=N'Execution', 
 		@step_id=1, 
 		@cmdexec_success_code=0, 
@@ -413,11 +420,7 @@ EXEC @ReturnCode = msdb.dbo.sp_add_jobstep @job_id=@jobId, @step_name=N'Executio
 		@retry_attempts=0, 
 		@retry_interval=0, 
 		@os_run_priority=0, @subsystem=N'TSQL', 
-		@command=N'USE ObjectDroppingTestDB
-GO
-EXEC uspTrialDemo;
-
-', 
+		@command=@commandValue, 
 		@database_name=N'master', 
 		@flags=0
 IF (@@ERROR <> 0 OR @ReturnCode <> 0) GOTO QuitWithRollback
@@ -425,8 +428,8 @@ EXEC @ReturnCode = msdb.dbo.sp_update_job @job_id = @jobId, @start_step_id = 1
 IF (@@ERROR <> 0 OR @ReturnCode <> 0) GOTO QuitWithRollback
 DECLARE @schedule_uid2 NVARCHAR(500)=(SELECT NEWID())
 
-DECLARE @freq_subday_type_Value INT=(SELECT ISNULL(freq_subday_type_Variable,4) FROM TrialTableConfig)
-DECLARE @freq_subday_interval_Value INT=(SELECT ISNULL(freq_subday_interval_Variable,4) FROM TrialTableConfig)
+DECLARE @freq_subday_type_Value INT=(SELECT ISNULL(freq_subday_type_Variable,4) FROM tempdb..##tempTrialTableConfig)
+DECLARE @freq_subday_interval_Value INT=(SELECT ISNULL(freq_subday_interval_Variable,4) FROM tempdb..##tempTrialTableConfig)
 EXEC @ReturnCode = msdb.dbo.sp_add_jobschedule @job_id=@jobId, @name=N'TrialJobSchedule', 
 		@enabled=1, 
 		@freq_type=4, 
