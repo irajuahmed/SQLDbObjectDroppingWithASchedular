@@ -1,4 +1,4 @@
-# DB Object Dropping With a SQL Server Job Schedular From Client's Demo Hosting Environment.
+# DB Object Dropping With a SQL Server Job Schedular From Client's Demo Hosting Environment. 
 Some time we need setup a demo environment to our client server for a specific time/period/days. Suppose after your trial period you may not have access to client server or you may forgot delete your setup environment. That's why I've made one/two SP &amp; a SQL Job Scheduler to delete the demo SQL environment/DB objects automatically from your client server/machine.
 
 ### File & Descriptions: Here I've added two follwing MS SQL Server Scripts.
@@ -17,5 +17,5 @@ Some time we need setup a demo environment to our client server for a specific t
 </p>
 
 
-<h3 align="left">Support:</h3>
+<h3 align="left">Support Me:</h3>
 <p><a href="https://www.buymeacoffee.com/https://www.buymeacoffee.com/mIUyB3X5P"> <img align="left" src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" height="50" width="210" alt="https://www.buymeacoffee.com/mIUyB3X5P" /></a></p><br><br>
