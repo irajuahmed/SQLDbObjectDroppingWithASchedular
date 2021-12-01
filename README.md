@@ -9,13 +9,17 @@ Some time we need setup a demo environment to our client server for a specific t
        then CATCH block will execute where we'll call our alter object SP named **_"uspTrialAlterAllObj"_**.
     3. At last I created a SQL Job Schedular named **_"TrialJob"_**.
      
+<h1 align="center">The End</h1>
 
-<h3 align="left">Connect with me:</h3>
-<p align="left">
-<a href="https://linkedin.com/in/www.linkedin.com/in/raju-ahmed-263475126" target="blank"><img align="center" src="https://cdn.jsdelivr.net/npm/simple-icons@3.0.1/icons/linkedin.svg" alt="www.linkedin.com/in/raju-ahmed-263475126" height="30" width="40" /></a>
-<a href="https://stackoverflow.com/users/5615778" target="blank"><img align="center" src="https://cdn.jsdelivr.net/npm/simple-icons@3.0.1/icons/stackoverflow.svg" alt="5615778" height="30" width="40" /></a>
-</p>
+<table align="center">
+<tr><th>Find me on following(s)</th><th>Support me on</th></tr>
+<tr><td>
 
+| [<img src="https://github.com/irajuahmed/irajuahmed/blob/main/images/github.png" alt="github logo" width="34">](https://github.com/irajuahmed) | [<img src="https://github.com/irajuahmed/irajuahmed/blob/main/images/instagram.jpg" alt="instagram logo" width="24">](https://www.instagram.com/marginalraju/) | [<img src="https://github.com/irajuahmed/irajuahmed/blob/main/images/Linkedin.png" alt="Linkedin Logo" width="24">](https://www.linkedin.com/in/raju-ahmed-263475126/)| [<img src="https://github.com/irajuahmed/irajuahmed/blob/main/images/stack.svg" alt="stack logo" width="24">](https://stackoverflow.com/users/5615778) 
+|---|---|---|---|
 
-<h3 align="left">Support Me:</h3>
-<p><a href="https://www.buymeacoffee.com/https://www.buymeacoffee.com/mIUyB3X5P"> <img align="left" src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" height="50" width="210" alt="https://www.buymeacoffee.com/mIUyB3X5P" /></a></p><br><br>
+</td><td>
+
+<p><a href="https://www.buymeacoffee.com/https://www.buymeacoffee.com/mIUyB3X5P"> <img align="left" src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" height="50" width="210" alt="https://www.buymeacoffee.com/mIUyB3X5P" /></a></p>
+
+</td></tr> </table>
